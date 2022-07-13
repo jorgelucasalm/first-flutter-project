@@ -37,7 +37,7 @@ class _RandomWordsState extends State<RandomWords> {
         onPressed: () {},
       ),
       body: Container(
-        child: _buildSuggestions(),
+        child: _buildCard(),
       ),
     );
   }
@@ -57,6 +57,34 @@ class _RandomWordsState extends State<RandomWords> {
           }
           return _buildRow(_suggestions[index]);
         });
+  }
+
+  Widget _buildCard() {
+    // final largura = MediaQuery.of(context).size.width;
+
+    return GridView.count(
+      crossAxisCount: 2,
+      padding: const EdgeInsets.all(16.0),
+      childAspectRatio: 2,
+      children: <Widget>[
+        Card(
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
+                child: Text(
+                  'Title',
+                  style: _biggerFont,
+                ),
+              ),
+            ],
+          ),
+        )
+      ],
+    );
   }
 
   Widget _buildRow(WordPair pair) {
