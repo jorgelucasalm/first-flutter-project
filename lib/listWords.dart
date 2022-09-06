@@ -20,7 +20,7 @@ class _RandomWordsState extends State<RandomWords> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Startup Name Generator'),
+        title: const Text('Gerador de Nomes'),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(_viewType == ViewType.list ? Icons.list : Icons.grid_view),
@@ -55,16 +55,17 @@ class _RandomWordsState extends State<RandomWords> {
             return const Divider();
           }
 
-          final int index = i ~/ 2;
+          final int index = i ~/ 1;
 
           if (index >= _suggestions.length) {
             _suggestions.addAll(generateWordPairs().take(10));
           }
-          return _buildRowCollumns(_suggestions[index]);
+          return _buildRowCollumns(
+              _suggestions[index], _suggestions[index + 1]);
         });
   }
 
-  Widget _buildRowCollumns(WordPair pair) {
+  Widget _buildRowCollumns(WordPair pair, WordPair pair2) {
     // final largura = MediaQuery.of(context).size.width;
     if (_viewType == ViewType.grid) {
       return Card(
@@ -79,7 +80,7 @@ class _RandomWordsState extends State<RandomWords> {
     } else {
       return ListTile(
         title: Text(
-          pair.asPascalCase,
+          pair2.asPascalCase,
           style: _biggerFont,
         ),
       );
