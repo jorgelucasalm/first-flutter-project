@@ -65,29 +65,6 @@ class _RandomWordsState extends State<RandomWords> {
           final alreadySaved = _saved.contains(_suggestions[index]);
 
           return _buildRowCollumns(_suggestions[index], alreadySaved);
-
-          return ListTile(
-            title: Text(
-              _suggestions[index].asPascalCase,
-              style: _biggerFont,
-            ),
-            trailing: Icon(
-              alreadySaved ? Icons.favorite : Icons.favorite_border,
-              color:
-                  alreadySaved ? const Color.fromARGB(255, 255, 115, 0) : null,
-              semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
-            ),
-            onTap: () {
-              setState(() {
-                //lógica da troca de estado
-                if (alreadySaved) {
-                  _saved.remove(_suggestions[index]);
-                } else {
-                  _saved.add(_suggestions[index]);
-                }
-              });
-            },
-          );
         });
   }
 
