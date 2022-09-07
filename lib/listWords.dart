@@ -12,6 +12,7 @@ class RandomWords extends StatefulWidget {
 
 class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
+  final _saved = <WordPair>{};
   final _biggerFont = const TextStyle(fontSize: 18);
   int _crossAxisCount = 2;
   ViewType _viewType = ViewType.grid;
@@ -60,29 +61,86 @@ class _RandomWordsState extends State<RandomWords> {
           if (index >= _suggestions.length) {
             _suggestions.addAll(generateWordPairs().take(10));
           }
-          return _buildRowCollumns(
-              _suggestions[index], _suggestions[index + 1]);
+
+          final alreadySaved = _saved.contains(_suggestions[index]);
+
+          return _buildRowCollumns(_suggestions[index], alreadySaved);
+
+          return ListTile(
+            title: Text(
+              _suggestions[index].asPascalCase,
+              style: _biggerFont,
+            ),
+            trailing: Icon(
+              alreadySaved ? Icons.favorite : Icons.favorite_border,
+              color:
+                  alreadySaved ? const Color.fromARGB(255, 255, 115, 0) : null,
+              semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
+            ),
+            onTap: () {
+              setState(() {
+                //lógica da troca de estado
+                if (alreadySaved) {
+                  _saved.remove(_suggestions[index]);
+                } else {
+                  _saved.add(_suggestions[index]);
+                }
+              });
+            },
+          );
         });
   }
 
-  Widget _buildRowCollumns(WordPair pair, WordPair pair2) {
+  Widget _buildRowCollumns(WordPair pair, alreadySaved) {
     // final largura = MediaQuery.of(context).size.width;
     if (_viewType == ViewType.grid) {
       return Card(
         margin: const EdgeInsets.all(16),
-        child: Center(
-          child: Text(
+        child: Column(children: [
+          Text(
             pair.asPascalCase,
             style: _biggerFont,
           ),
-        ),
+          IconButton(
+            icon: Icon(
+              alreadySaved ? Icons.favorite : Icons.favorite_border,
+              color: alreadySaved ? Colors.purple : null,
+              semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
+            ),
+            onPressed: () {
+              setState(() {
+                //lógica da troca de estado
+                if (alreadySaved) {
+                  _saved.remove(pair);
+                } else {
+                  _saved.add(pair);
+                }
+              });
+            },
+          ),
+        ]),
       );
     } else {
       return ListTile(
         title: Text(
-          pair2.asPascalCase,
+          pair.asPascalCase,
           style: _biggerFont,
         ),
+        trailing: Icon(
+          alreadySaved ? Icons.favorite : Icons.favorite_border,
+          color: alreadySaved ? Colors.purple : null,
+          semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
+        ),
+        onTap: () {
+          setState(() {
+            //lógica da troca de estado
+            if (alreadySaved) {
+              _saved.remove(pair);
+            } else {
+              _saved.add(pair);
+            }
+          });
+        },
       );
     }
   }
