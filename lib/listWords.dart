@@ -56,6 +56,22 @@ class _RandomWordsState extends State<RandomWords> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gerador de Nomes'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditionText(
+                      words: _word,
+                      index: 0,
+                      isEdit: false,
+                    ),
+                  )).then((_) => setState(() {}));
+            },
+            icon: Icon(Icons.add),
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(_viewType == ViewType.list ? Icons.list : Icons.grid_view),
@@ -155,6 +171,7 @@ class _RandomWordsState extends State<RandomWords> {
                       builder: (context) => EditionText(
                         words: _word,
                         index: index,
+                        isEdit: true,
                       ),
                     )).then((_) => setState(() {}));
               },
