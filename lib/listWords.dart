@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+import 'package:flutter_teste/editionText.dart';
 
 enum ViewType { grid, list }
 
@@ -15,7 +16,7 @@ class RandomWords extends StatefulWidget {
 class Words {
   List<String> _words = [];
 
-  List getAllWords() {
+  List<String> getAllWords() {
     _words = [
       'Flutter',
       'CSS',
@@ -48,7 +49,7 @@ class _RandomWordsState extends State<RandomWords> {
   final _biggerFont = const TextStyle(fontSize: 18);
   int _crossAxisCount = 2;
   ViewType _viewType = ViewType.grid;
-  final _word = Words().getAllWords();
+  List<String> _word = Words().getAllWords();
 
   @override
   Widget build(BuildContext context) {
@@ -104,11 +105,11 @@ class _RandomWordsState extends State<RandomWords> {
           index == 20 ? index - 1 : index;
           final alreadySaved = _saved.contains(_word[index]);
 
-          return _buildRowCollumns(_word[index], alreadySaved);
+          return _buildRowCollumns(_word[index], alreadySaved, index);
         });
   }
 
-  Widget _buildRowCollumns(pair, alreadySaved) {
+  Widget _buildRowCollumns(pair, alreadySaved, index) {
     // final largura = MediaQuery.of(context).size.width;
     if (_viewType == ViewType.grid) {
       return Card(
@@ -141,9 +142,23 @@ class _RandomWordsState extends State<RandomWords> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            pair,
-            style: _biggerFont,
+          Expanded(
+            child: InkWell(
+              child: Text(
+                pair,
+                style: _biggerFont,
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditionText(
+                        words: _word,
+                        index: index,
+                      ),
+                    )).then((_) => setState(() {}));
+              },
+            ),
           ),
           Row(
             children: [
@@ -178,28 +193,6 @@ class _RandomWordsState extends State<RandomWords> {
           )
         ],
       );
-
-      // ListTile(
-      //   title: Text(
-      //     pair,
-      //     style: _biggerFont,
-      //   ),
-      //   trailing: Icon(
-      //     alreadySaved ? Icons.favorite : Icons.favorite_border,
-      //     color: alreadySaved ? Colors.purple : null,
-      //     semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
-      //   ),
-      //   onTap: () {
-      //     setState(() {
-      //       //lógica da troca de estado
-      //       if (alreadySaved) {
-      //         _saved.remove(pair);
-      //       } else {
-      //         _saved.add(pair);
-      //       }
-      //     });
-      //   },
-      // );
     }
   }
 }
