@@ -145,26 +145,37 @@ class _RandomWordsState extends State<RandomWords> {
             pair,
             style: _biggerFont,
           ),
-          IconButton(
-            icon: Icon(
-              alreadySaved ? Icons.favorite : Icons.favorite_border,
-              color: alreadySaved ? Colors.purple : null,
-              semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
-            ),
-            tooltip: 'Increase volume by 10',
-            onPressed: () {
-              setState(() {
-                setState(() {
-                  //lógica da troca de estado
-                  if (alreadySaved) {
-                    _saved.remove(pair);
-                  } else {
-                    _saved.add(pair);
-                  }
-                });
-              });
-            },
-          ),
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.delete,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _word.removeWhere((item) => item == pair);
+                  });
+                },
+              ),
+              IconButton(
+                icon: Icon(
+                  alreadySaved ? Icons.favorite : Icons.favorite_border,
+                  color: alreadySaved ? Colors.purple : null,
+                  semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
+                ),
+                onPressed: () {
+                  setState(() {
+                    //lógica da troca de estado
+                    if (alreadySaved) {
+                      _saved.remove(pair);
+                    } else {
+                      _saved.add(pair);
+                    }
+                  });
+                },
+              ),
+            ],
+          )
         ],
       );
 
