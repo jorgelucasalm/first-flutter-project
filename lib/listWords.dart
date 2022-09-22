@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
@@ -10,12 +12,43 @@ class RandomWords extends StatefulWidget {
   _RandomWordsState createState() => _RandomWordsState();
 }
 
+class Words {
+  List<String> _words = [];
+
+  List getAllWords() {
+    _words = [
+      'Flutter',
+      'CSS',
+      'HTML',
+      'C',
+      'C+',
+      'C++',
+      'C#',
+      'PHP',
+      'Java',
+      'Javascript',
+      'ReactJS',
+      'React Native',
+      'Jack',
+      'Assembly',
+      'Vue JS',
+      'Ruby',
+      'Python',
+      'TypeScript',
+      'Visual Studio',
+      'Intellij',
+    ];
+    return _words;
+  }
+}
+
 class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _saved = <WordPair>{};
+  final _suggestions = <String>[];
+  final _saved = <String>{};
   final _biggerFont = const TextStyle(fontSize: 18);
   int _crossAxisCount = 2;
   ViewType _viewType = ViewType.grid;
+  final _word = Words().getAllWords();
 
   @override
   Widget build(BuildContext context) {
@@ -45,37 +78,44 @@ class _RandomWordsState extends State<RandomWords> {
   Widget _buildCard() {
     // final largura = MediaQuery.of(context).size.width;
 
+    // return Column(
+    //   children: _word.asMap().entries.map((text) {
+    //     if (text.key.isOdd && _viewType == ViewType.list) {
+    //       return const Divider();
+    //     }
+
+    //     final int index = text.key;
+    //     index == 20 ? index - 1 : index;
+
+    //     final alreadySaved = _saved.contains(_word[index]);
+    //     return _buildRowCollumns(_word[index], alreadySaved);
+    //   }).toList(),
+    // );
+
     return GridView.builder(
+        itemCount: _word.length,
         padding: const EdgeInsets.all(16.0),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: _crossAxisCount,
           childAspectRatio: _viewType == ViewType.grid ? 1 : 10,
         ),
         itemBuilder: (BuildContext _context, int i) {
-          if (i.isOdd && _viewType == ViewType.list) {
-            return const Divider();
-          }
+          final int index = i;
+          index == 20 ? index - 1 : index;
+          final alreadySaved = _saved.contains(_word[index]);
 
-          final int index = i ~/ 1;
-
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10));
-          }
-
-          final alreadySaved = _saved.contains(_suggestions[index]);
-
-          return _buildRowCollumns(_suggestions[index], alreadySaved);
+          return _buildRowCollumns(_word[index], alreadySaved);
         });
   }
 
-  Widget _buildRowCollumns(WordPair pair, alreadySaved) {
+  Widget _buildRowCollumns(pair, alreadySaved) {
     // final largura = MediaQuery.of(context).size.width;
     if (_viewType == ViewType.grid) {
       return Card(
         margin: const EdgeInsets.all(16),
         child: Column(children: [
           Text(
-            pair.asPascalCase,
+            pair,
             style: _biggerFont,
           ),
           IconButton(
@@ -98,27 +138,57 @@ class _RandomWordsState extends State<RandomWords> {
         ]),
       );
     } else {
-      return ListTile(
-        title: Text(
-          pair.asPascalCase,
-          style: _biggerFont,
-        ),
-        trailing: Icon(
-          alreadySaved ? Icons.favorite : Icons.favorite_border,
-          color: alreadySaved ? Colors.purple : null,
-          semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
-        ),
-        onTap: () {
-          setState(() {
-            //lógica da troca de estado
-            if (alreadySaved) {
-              _saved.remove(pair);
-            } else {
-              _saved.add(pair);
-            }
-          });
-        },
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            pair,
+            style: _biggerFont,
+          ),
+          IconButton(
+            icon: Icon(
+              alreadySaved ? Icons.favorite : Icons.favorite_border,
+              color: alreadySaved ? Colors.purple : null,
+              semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
+            ),
+            tooltip: 'Increase volume by 10',
+            onPressed: () {
+              setState(() {
+                setState(() {
+                  //lógica da troca de estado
+                  if (alreadySaved) {
+                    _saved.remove(pair);
+                  } else {
+                    _saved.add(pair);
+                  }
+                });
+              });
+            },
+          ),
+        ],
       );
+
+      // ListTile(
+      //   title: Text(
+      //     pair,
+      //     style: _biggerFont,
+      //   ),
+      //   trailing: Icon(
+      //     alreadySaved ? Icons.favorite : Icons.favorite_border,
+      //     color: alreadySaved ? Colors.purple : null,
+      //     semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
+      //   ),
+      //   onTap: () {
+      //     setState(() {
+      //       //lógica da troca de estado
+      //       if (alreadySaved) {
+      //         _saved.remove(pair);
+      //       } else {
+      //         _saved.add(pair);
+      //       }
+      //     });
+      //   },
+      // );
     }
   }
 }
