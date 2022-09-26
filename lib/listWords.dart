@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter_teste/editionText.dart';
@@ -51,11 +52,20 @@ class _RandomWordsState extends State<RandomWords> {
   ViewType _viewType = ViewType.grid;
   List<String> _word = Words().getAllWords();
 
+  static dynamic fromJson(Map<String, dynamic> json) =>
+      {'name': json['name'], 'id': json['id']};
+
+  Stream<List<dynamic>> readUsers() => FirebaseFirestore.instance
+      .collection('languages')
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => fromJson(doc.data())).toList());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gerador de Nomes'),
+        title: const Text('Listagem de Linguagem de programação'),
         actions: [
           IconButton(
             onPressed: () {
@@ -63,8 +73,8 @@ class _RandomWordsState extends State<RandomWords> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => EditionText(
-                      words: _word,
-                      index: 0,
+                      words: '',
+                      index: '',
                       isEdit: false,
                     ),
                   )).then((_) => setState(() {}));
@@ -93,66 +103,89 @@ class _RandomWordsState extends State<RandomWords> {
   }
 
   Widget _buildCard() {
-    // final largura = MediaQuery.of(context).size.width;
+    return StreamBuilder<List<dynamic>>(
+      stream: readUsers(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final languages = snapshot.data!;
+          print(languages);
+          return GridView.builder(
+              itemCount: languages.length,
+              padding: const EdgeInsets.all(16.0),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: _crossAxisCount,
+                childAspectRatio: _viewType == ViewType.grid ? 1 : 10,
+              ),
+              itemBuilder: (BuildContext _context, int i) {
+                final int index = i;
+                index == 20 ? index - 1 : index;
+                final alreadySaved = _saved.contains(languages[index]['name']);
+                return _buildRowCollumns(languages[index]['name'], alreadySaved,
+                    languages[index]['id']);
+              });
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
 
-    // return Column(
-    //   children: _word.asMap().entries.map((text) {
-    //     if (text.key.isOdd && _viewType == ViewType.list) {
-    //       return const Divider();
-    //     }
-
-    //     final int index = text.key;
-    //     index == 20 ? index - 1 : index;
-
-    //     final alreadySaved = _saved.contains(_word[index]);
-    //     return _buildRowCollumns(_word[index], alreadySaved);
-    //   }).toList(),
-    // );
-
-    return GridView.builder(
-        itemCount: _word.length,
-        padding: const EdgeInsets.all(16.0),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: _crossAxisCount,
-          childAspectRatio: _viewType == ViewType.grid ? 1 : 10,
-        ),
-        itemBuilder: (BuildContext _context, int i) {
-          final int index = i;
-          index == 20 ? index - 1 : index;
-          final alreadySaved = _saved.contains(_word[index]);
-
-          return _buildRowCollumns(_word[index], alreadySaved, index);
-        });
+    //
   }
 
   Widget _buildRowCollumns(pair, alreadySaved, index) {
     // final largura = MediaQuery.of(context).size.width;
     if (_viewType == ViewType.grid) {
-      return Card(
-        margin: const EdgeInsets.all(16),
-        child: Column(children: [
-          Text(
-            pair,
-            style: _biggerFont,
-          ),
-          IconButton(
-            icon: Icon(
-              alreadySaved ? Icons.favorite : Icons.favorite_border,
-              color: alreadySaved ? Colors.purple : null,
-              semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
+      return InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditionText(
+                  words: pair,
+                  index: index,
+                  isEdit: true,
+                ),
+              )).then((_) => setState(() {}));
+        },
+        child: Card(
+          margin: const EdgeInsets.all(16),
+          child: Column(children: [
+            Text(
+              pair,
+              style: _biggerFont,
             ),
-            onPressed: () {
-              setState(() {
-                //lógica da troca de estado
-                if (alreadySaved) {
-                  _saved.remove(pair);
-                } else {
-                  _saved.add(pair);
-                }
-              });
-            },
-          ),
-        ]),
+            IconButton(
+              icon: Icon(
+                Icons.delete,
+              ),
+              onPressed: () {
+                final docLanguage = FirebaseFirestore.instance
+                    .collection('languages')
+                    .doc(index);
+                docLanguage.delete();
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                alreadySaved ? Icons.favorite : Icons.favorite_border,
+                color: alreadySaved ? Colors.purple : null,
+                semanticLabel: alreadySaved ? 'Removido' : 'Salvo',
+              ),
+              onPressed: () {
+                setState(() {
+                  //lógica da troca de estado
+                  if (alreadySaved) {
+                    _saved.remove(pair);
+                  } else {
+                    _saved.add(pair);
+                  }
+                });
+              },
+            ),
+          ]),
+        ),
       );
     } else {
       return Row(
@@ -169,7 +202,7 @@ class _RandomWordsState extends State<RandomWords> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => EditionText(
-                        words: _word,
+                        words: pair,
                         index: index,
                         isEdit: true,
                       ),
@@ -184,9 +217,10 @@ class _RandomWordsState extends State<RandomWords> {
                   Icons.delete,
                 ),
                 onPressed: () {
-                  setState(() {
-                    _word.removeWhere((item) => item == pair);
-                  });
+                  final docLanguage = FirebaseFirestore.instance
+                      .collection('languages')
+                      .doc(index);
+                  docLanguage.delete();
                 },
               ),
               IconButton(

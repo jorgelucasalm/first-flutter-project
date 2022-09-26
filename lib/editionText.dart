@@ -1,10 +1,11 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class EditionText extends StatefulWidget {
-  List<String> words;
-  int index;
+  String words;
+  String index;
   bool isEdit;
 
   EditionText({required this.words, required this.index, required this.isEdit});
@@ -14,9 +15,9 @@ class EditionText extends StatefulWidget {
 }
 
 class _EditionText extends State<EditionText> {
-  List<String> words = [];
+  String words = '';
   String initialWord = '';
-  int index = 0;
+  String index = '';
   bool isEdit = false;
   final txtController = TextEditingController(text: '');
 
@@ -25,7 +26,7 @@ class _EditionText extends State<EditionText> {
     words = widget.words;
     index = widget.index;
     isEdit = widget.isEdit;
-    initialWord = widget.isEdit ? words[widget.index] : '';
+    initialWord = widget.isEdit ? words : '';
     txtController.text = initialWord;
   }
 
@@ -66,9 +67,15 @@ class _EditionText extends State<EditionText> {
             ElevatedButton(
               onPressed: () {
                 if (isEdit) {
-                  words[index] = txtController.text;
+                  final docLanguage = FirebaseFirestore.instance
+                      .collection('languages')
+                      .doc(index);
+                  docLanguage.update({
+                    'name': txtController.text,
+                  });
+                  Navigator.pop(context);
                 } else {
-                  words.add(txtController.text);
+                  createLanguage(name: txtController.text);
                   Navigator.pop(context);
                 }
               },
@@ -78,5 +85,13 @@ class _EditionText extends State<EditionText> {
         )
       ],
     );
+  }
+
+  Future createLanguage({required String name}) async {
+    final docLanguage =
+        FirebaseFirestore.instance.collection('languages').doc();
+    final language = {'name': name, 'id': docLanguage.id};
+
+    await docLanguage.set(language);
   }
 }

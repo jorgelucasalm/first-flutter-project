@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "569891225250",
+    "project_id": "topico-7-dsi",
+    "storage_bucket": "topico-7-dsi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:569891225250:android:549c0d4b7052854864e1fb",
+        "android_client_info": {
+          "package_name": "com.example.flutter_teste"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "569891225250-3f47pqbsuc1frkg0j1tifs96iro1pd5a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZc5X4OB8hrjkNydzAiz0sThLgvCeFwGI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "569891225250-3f47pqbsuc1frkg0j1tifs96iro1pd5a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
